@@ -2,7 +2,7 @@
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
+      <header className="h-screen grid place-content-center text-3xl">
         <p>
           Hello World
         </p>
