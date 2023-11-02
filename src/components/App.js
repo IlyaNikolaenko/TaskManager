@@ -1,12 +1,11 @@
+import CustomCalendar from "./CustomCalendar";
+import CustomHeader from "./CustomHeader";
 
 function App() {
   return (
-    <div className="App">
-      <header className="h-screen grid place-content-center text-3xl">
-        <p>
-          Hello World
-        </p>
-      </header>
+    <div className="h-full  bg-gray-100">
+      <CustomHeader/>
+      <CustomCalendar/>
     </div>
   );
 }
