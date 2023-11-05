@@ -1,32 +1,30 @@
-import { Fragment, useContext, useEffect, useRef, useState } from "react";
+import { Fragment, useContext, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { eventStoreContext } from "./EventStore";
 import { observer } from "mobx-react-lite";
-import { autorun } from "mobx";
 
-const CustomModal = observer(function CustomModal() {
-    const eventStore = useContext(eventStoreContext);
-    const [open, setOpen] = useState(eventStore.open);
+const CustomModal = observer(() => {
+  const eventStore = useContext(eventStoreContext);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
   const cancelButtonRef = useRef(null);
 
-console.log(eventStore)
-  const handleDataAdd =  (e) => {
+  const handleDataAdd = (e) => {
     e.preventDefault();
     let title = firstName + " " + lastName;
-   eventStore.changeEvent(null, title); 
-  }
+    eventStore.changeEvent(title);
+    eventStore.toggleModal();
+  };
 
   return (
     <>
-      <Transition.Root show={open} as={Fragment}>
+      <Transition.Root show={eventStore.open} as={Fragment}>
         <Dialog
           as="div"
           className="relative z-10"
           initialFocus={cancelButtonRef}
-          onClose={eventStore.toggleModal}
+          onClose={() =>{eventStore.toggleModal()}}
         >
           <Transition.Child
             as={Fragment}
@@ -61,17 +59,30 @@ console.log(eventStore)
                         <ul className="">
                           <li className="">
                             <p className="text-sm font-semibold leading-6 text-gray-900">
-                              Fullname: {}
+                              Fullname: {firstName + " " + lastName}
                             </p>
                           </li>
                           <li className="">
                             <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                              Start: {}
+                              Start: {
+                                 eventStore.currentEvent?.event ?
+                                  eventStore.currentEvent.event.startStr.replace('T', " ").replace("+", " GMT+")  :
+                                   eventStore.currentEvent?.start ?
+                                    eventStore.currentEvent.start.toString():
+                                     null
+                                  }
                             </p>
                           </li>
                           <li className="">
                             <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                              End: {}
+                              End: {
+                                eventStore.currentEvent?.event ?
+                                eventStore.currentEvent.event.endStr.replace('T', " ").replace("+", " GMT+")  :
+                                 eventStore.currentEvent?.end ?
+                                  eventStore.currentEvent.end.toString():
+                                   null
+                               
+                              }
                             </p>
                           </li>
                         </ul>
@@ -86,9 +97,7 @@ console.log(eventStore)
                             <div className="mt-1">
                               <input
                                 value={firstName}
-                                onChange={(e) =>
-                                  setFirstName(e.target.value)
-                                }
+                                onChange={(e) => setFirstName(e.target.value)}
                                 type="text"
                                 name="first-name"
                                 id="first-name"
@@ -124,14 +133,14 @@ console.log(eventStore)
                       <button
                         type="button"
                         className="text-sm font-semibold leading-6 text-red-900"
-                        onClick={eventStore.deleteEvent}
+                        onClick={() => {eventStore.deleteEvent()}}
                       >
                         Delete
                       </button>
                       <button
                         type="button"
                         className="text-sm font-semibold leading-6 text-gray-900"
-                        onClick={eventStore.toggleModal}
+                        onClick={()=>{eventStore.toggleModal()}}
                       >
                         Cancel
                       </button>
@@ -151,6 +160,5 @@ console.log(eventStore)
       </Transition.Root>
     </>
   );
-}
-)
+});
 export default CustomModal;

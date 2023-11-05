@@ -1,9 +1,11 @@
+import { makeAutoObservable } from "mobx";
 import { createContext } from "react";
 
 export class EventStore {
   weekendsVisible = true;
   open = false;
   eventGuid = 0;
+  currentEvent = null;
   events = [
     {
       id: this.createEventId(),
@@ -18,6 +20,9 @@ export class EventStore {
       allDay: false,
     },
   ];
+  constructor() {
+    makeAutoObservable(this);
+  }
 
   getEvents() {
     return this.events;
@@ -34,23 +39,27 @@ export class EventStore {
       allDay: selectInfo.allDay,
     });
   }
-  deleteEvent(id) {
-    this.events.splice(
-      this.events.findIndex((e) => e.id === id),
-      1
-    );
-  }
-  changeEvent(changeInfo) {
-    const newEvent = changeInfo.event;
-    const storedEvent = this.events.find((e) => e.id === changeInfo.event.id);
-    if (storedEvent) {
-      storedEvent.title = newEvent.title;
-      storedEvent.allDay = newEvent.allDay;
-      storedEvent.start = newEvent.start || storedEvent.start;
-      storedEvent.end = newEvent.end || storedEvent.end;
+  deleteEvent() {
+    if(this.currentEvent.event){
+        this.toggleModal()
+    this.currentEvent.event.remove();
     }
   }
-  toggleModal(){
+  changeEvent(title) {
+    if (this.currentEvent.event) {
+      this.currentEvent.event.setProp("title", title);
+    } else {
+      this.currentEvent.view.calendar.addEvent({
+        id: this.createEventId(),
+        title: title || "New Event",
+        start: this.currentEvent.start,
+        end: this.currentEvent.end,
+        allDay: this.currentEvent.allDay,
+      });
+    }
+  }
+
+  toggleModal() {
     this.open = !this.open;
   }
   toggleWeekends() {

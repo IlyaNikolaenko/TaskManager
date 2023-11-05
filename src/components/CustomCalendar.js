@@ -13,9 +13,8 @@ const CustomCalendar = observer(function CustomCalendar() {
 
   const handleDateSelect = (selectInfo) => {
     eventStore.toggleModal();
-    let calendarApi = selectInfo.view.calendar
-
-    calendarApi.unselect() // clear date selection
+    eventStore.currentEvent = selectInfo
+    selectInfo.view.calendar.unselect() // clear date selection
   }
 
 
@@ -23,8 +22,7 @@ const CustomCalendar = observer(function CustomCalendar() {
   function renderEventContent(eventInfo) {
     return (
       <>
-        <b>{eventInfo.timeText}</b>
-        <i>{eventInfo.event.title}</i>
+        <b>{eventInfo.event.title !== ' ' ? eventInfo.event.title : "No Name"}</b>
       </>
     )
   }
