@@ -1,75 +1,106 @@
-import logo from "../assets/logo/png/logo-no-background.png"
-import userImage from "../assets/userImg/i-high-resolution-logo.png"
-import { Fragment } from 'react'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-
-const user = {
-    name: 'Ilya Nik',
-    email: 'qwer@example.com',
-    imageUrl: userImage,
-}
-const navigation = [
-    { name: 'Dashboard', href: '#', current: true },
-    { name: 'Calendar', href: '#', current: false },
-]
-const userNavigation = [
-    { name: 'Your Profile', href: '#' },
-    { name: 'Settings', href: '#' },
-    { name: 'Sign out', href: '#' },
-]
+import logo from "../assets/logo/png/logo-no-background.png";
+import userImage from "../assets/userImg/i-high-resolution-logo.png";
+import { Fragment, useEffect, useState } from "react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-}  
+  return classes.filter(Boolean).join(" ");
+}
 
 export default function CustomHeader() {
-    return (
-      <>
-        <div className="min-h-full">
-          <Disclosure as="nav" className="bg-gray-800">
-            {({ open }) => (
-              <>
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                  <div className="flex h-16 items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <img
-                          className="h-10 w-10"
-                          src={logo}
-                          alt="Task Manager"
-                        />
-                      </div>
-                      <div className="hidden md:block">
-                        <div className="ml-10 flex items-baseline space-x-4">
-                          {navigation.map((item) => (
-                            <a
-                              key={item.name}
-                              href={item.href}
-                              className={classNames(
-                                item.current
-                                  ? 'bg-gray-900 text-white'
-                                  : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                'rounded-md px-3 py-2 text-sm font-medium'
-                              )}
-                              aria-current={item.current ? 'page' : undefined}
-                            >
-                              {item.name}
-                            </a>
-                          ))}
-                        </div>
-                      </div>
+  const [isLogged, setIsLogged] = useState(false);
+  const gsi = window.google.accounts.id;
+  const user = {
+    name: "Ilya Nik",
+    email: "qwer@example.com",
+    imageUrl: userImage,
+  };
+  const navigation = [
+    { name: "Dashboard", href: "#", current: false, isLogged: !isLogged },
+    { name: "Calendar", href: "#", current: true },
+  ];
+  const userNavigation = [
+    { name: "Your Profile", href: "#" },
+    { name: "Settings", href: "#" },
+    { name: "Sign out", href: "#", onClick: handleSignOut },
+  ];
+  const handleCredentialResponce = (resp) => {
+    setIsLogged(true);
+    console.log("resp", resp);
+  };
+  const onClickHandler = (click) => {
+    console.log("click", click);
+  };
+  function handleSignOut() {
+    console.log("Out");
+    setIsLogged(false);
+    gsi.disableAutoSelect();
+  }
+  useEffect(() => {
+    gsi.initialize({
+      client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+      callback: handleCredentialResponce,
+    });
+    gsi.prompt();
+    gsi.renderButton(document.getElementById("signIn"), {
+      type: "icon",
+      click_listener: onClickHandler,
+    });
+  });
+  return (
+    <>
+      <div className="min-h-full">
+        <Disclosure as="nav" className="bg-gray-800">
+          {({ open }) => (
+            <>
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="flex h-16 items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <img
+                        className="h-10 w-10"
+                        src={logo}
+                        alt="Task Manager"
+                      />
                     </div>
                     <div className="hidden md:block">
+                      <div className="ml-10 flex items-baseline space-x-4">
+                        {navigation.map((item) => (
+                          
+                          <a
+                            key={item.name}
+                            href={item.href}
+                            hidden={item?.isLogged}
+                            className={classNames(
+                              item.current
+                                ? "bg-gray-900 text-white"
+                                : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                              "rounded-md px-3 py-2 text-sm font-medium"
+                            )}
+                            aria-current={item.current ? "page" : undefined}
+                          >
+                            {item.name}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div id="signIn" hidden={isLogged}></div>
+                  {isLogged ? (
+                    <div className="hidden md:block">
                       <div className="ml-4 flex items-center md:ml-6">
-  
                         {/* Profile dropdown */}
                         <Menu as="div" className="relative ml-3">
                           <div>
                             <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                               <span className="absolute -inset-1.5" />
                               <span className="sr-only">Open user menu</span>
-                              <img className="h-8 w-8 rounded-full" src={user.imageUrl} alt="" />
+                              <img
+                                className="h-8 w-8 rounded-full"
+                                src={user.imageUrl}
+                                alt=""
+                              />
                             </Menu.Button>
                           </div>
                           <Transition
@@ -87,9 +118,10 @@ export default function CustomHeader() {
                                   {({ active }) => (
                                     <a
                                       href={item.href}
+                                      onClick={item.onClick}
                                       className={classNames(
-                                        active ? 'bg-gray-100' : '',
-                                        'block px-4 py-2 text-sm text-gray-700'
+                                        active ? "bg-gray-100" : "",
+                                        "block px-4 py-2 text-sm text-gray-700"
                                       )}
                                     >
                                       {item.name}
@@ -102,46 +134,66 @@ export default function CustomHeader() {
                         </Menu>
                       </div>
                     </div>
+                  ) : null}
+                  {isLogged ? (
                     <div className="-mr-2 flex md:hidden">
                       {/* Mobile menu button */}
                       <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                         <span className="absolute -inset-0.5" />
                         <span className="sr-only">Open main menu</span>
                         {open ? (
-                          <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                          <XMarkIcon
+                            className="block h-6 w-6"
+                            aria-hidden="true"
+                          />
                         ) : (
-                          <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                          <Bars3Icon
+                            className="block h-6 w-6"
+                            aria-hidden="true"
+                          />
                         )}
                       </Disclosure.Button>
                     </div>
-                  </div>
+                  ) : null}
                 </div>
-  
-                <Disclosure.Panel className="md:hidden">
-                  <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-                    {navigation.map((item) => (
-                      <Disclosure.Button
-                        key={item.name}
-                        as="a"
-                        href={item.href}
-                        className={classNames(
-                          item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                          'block rounded-md px-3 py-2 text-base font-medium'
-                        )}
-                        aria-current={item.current ? 'page' : undefined}
-                      >
-                        {item.name}
-                      </Disclosure.Button>
-                    ))}
-                  </div>
+              </div>
+
+              <Disclosure.Panel className="md:hidden">
+                <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
+                  {navigation.map((item) => (
+                    <Disclosure.Button
+                      key={item.name}
+                      as="a"
+                      href={item.href}
+                      className={classNames(
+                        item.current
+                          ? "bg-gray-900 text-white"
+                          : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                        "block rounded-md px-3 py-2 text-base font-medium"
+                      )}
+                      aria-current={item.current ? "page" : undefined}
+                    >
+                      {item.name}
+                    </Disclosure.Button>
+                  ))}
+                </div>
+                {isLogged ? (
                   <div className="border-t border-gray-700 pb-3 pt-4">
                     <div className="flex items-center px-5">
                       <div className="flex-shrink-0">
-                        <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt="" />
+                        <img
+                          className="h-10 w-10 rounded-full"
+                          src={user.imageUrl}
+                          alt=""
+                        />
                       </div>
                       <div className="ml-3">
-                        <div className="text-base font-medium leading-none text-white">{user.name}</div>
-                        <div className="text-sm font-medium leading-none text-gray-400">{user.email}</div>
+                        <div className="text-base font-medium leading-none text-white">
+                          {user.name}
+                        </div>
+                        <div className="text-sm font-medium leading-none text-gray-400">
+                          {user.email}
+                        </div>
                       </div>
                       <button
                         type="button"
@@ -158,6 +210,7 @@ export default function CustomHeader() {
                           key={item.name}
                           as="a"
                           href={item.href}
+                          onClick={item.onClick}
                           className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
                         >
                           {item.name}
@@ -165,11 +218,12 @@ export default function CustomHeader() {
                       ))}
                     </div>
                   </div>
-                </Disclosure.Panel>
-              </>
-            )}
-          </Disclosure>
-        </div>
-      </>
-    )
-  }
+                ) : null}
+              </Disclosure.Panel>
+            </>
+          )}
+        </Disclosure>
+      </div>
+    </>
+  );
+}
