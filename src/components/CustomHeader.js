@@ -1,53 +1,58 @@
 import logo from "../assets/logo/png/logo-no-background.png";
-import userImage from "../assets/userImg/i-high-resolution-logo.png";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, useContext } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { jwtDecode } from "jwt-decode";
+import { eventStoreContext } from "./EventStore";
+import { observer } from "mobx-react-lite";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function CustomHeader() {
+const CustomHeader = observer(function () {
+  const eventStore = useContext(eventStoreContext);
+
   const [isLogged, setIsLogged] = useState(false);
   const gsi = window.google.accounts.id;
-  const user = {
-    name: "Ilya Nik",
-    email: "qwer@example.com",
-    imageUrl: userImage,
-  };
+
   const navigation = [
     { name: "Dashboard", href: "#", current: false, isLogged: !isLogged },
     { name: "Calendar", href: "#", current: true },
   ];
   const userNavigation = [
-    { name: "Your Profile", href: "#" },
-    { name: "Settings", href: "#" },
     { name: "Sign out", href: "#", onClick: handleSignOut },
   ];
-  const handleCredentialResponce = (resp) => {
-    setIsLogged(true);
-    console.log("resp", resp);
-  };
-  const onClickHandler = (click) => {
-    console.log("click", click);
-  };
-  function handleSignOut() {
-    console.log("Out");
-    setIsLogged(false);
-    gsi.disableAutoSelect();
-  }
+
   useEffect(() => {
     gsi.initialize({
       client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
       callback: handleCredentialResponce,
     });
-    gsi.prompt();
+    //gsi.prompt(); // If you want use a One tap Auth
     gsi.renderButton(document.getElementById("signIn"), {
       type: "icon",
-      click_listener: onClickHandler,
     });
   });
+
+  const handleCredentialResponce = (resp) => {
+    setIsLogged(true);
+    const profile = jwtDecode(resp.credential);
+    eventStore.user = {
+      name: profile.name,
+      email: profile.email,
+      id: profile.sub,
+      imageUrl: profile.picture,
+      firstName: profile.given_name,
+      lastName: profile.family_name,
+    };
+  };
+
+  function handleSignOut() {
+    setIsLogged(false);
+    gsi.disableAutoSelect();
+  }
+
   return (
     <>
       <div className="min-h-full">
@@ -67,7 +72,6 @@ export default function CustomHeader() {
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
                         {navigation.map((item) => (
-                          
                           <a
                             key={item.name}
                             href={item.href}
@@ -98,7 +102,7 @@ export default function CustomHeader() {
                               <span className="sr-only">Open user menu</span>
                               <img
                                 className="h-8 w-8 rounded-full"
-                                src={user.imageUrl}
+                                src={eventStore.user.imageUrl}
                                 alt=""
                               />
                             </Menu.Button>
@@ -183,16 +187,16 @@ export default function CustomHeader() {
                       <div className="flex-shrink-0">
                         <img
                           className="h-10 w-10 rounded-full"
-                          src={user.imageUrl}
+                          src={eventStore.user.imageUrl}
                           alt=""
                         />
                       </div>
                       <div className="ml-3">
                         <div className="text-base font-medium leading-none text-white">
-                          {user.name}
+                          {eventStore.user.name}
                         </div>
                         <div className="text-sm font-medium leading-none text-gray-400">
-                          {user.email}
+                          {eventStore.user.email}
                         </div>
                       </div>
                       <button
@@ -226,4 +230,5 @@ export default function CustomHeader() {
       </div>
     </>
   );
-}
+});
+export default CustomHeader;

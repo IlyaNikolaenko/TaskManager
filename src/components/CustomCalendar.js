@@ -7,26 +7,30 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { observer } from "mobx-react-lite";
 import { eventStoreContext } from "./EventStore";
 
-
 const CustomCalendar = observer(function CustomCalendar() {
-  const eventStore = useContext(eventStoreContext);  
+  const eventStore = useContext(eventStoreContext);
 
   const handleDateSelect = (selectInfo) => {
-    eventStore.toggleModal();
-    eventStore.currentEvent = selectInfo
-    selectInfo.view.calendar.unselect() // clear date selection
-  }
-
-
+    if (!selectInfo?.event) {
+      eventStore.toggleModal();
+      eventStore.currentEvent = selectInfo;
+      selectInfo.view.calendar.unselect(); // clear date selection
+    } else if (selectInfo?.event.id === eventStore.user.id) {
+      eventStore.toggleModal();
+      eventStore.currentEvent = selectInfo;
+      selectInfo.view.calendar.unselect(); // clear date selection
+    }
+  };
 
   function renderEventContent(eventInfo) {
     return (
       <>
-        <b>{eventInfo.event.title !== ' ' ? eventInfo.event.title : "No Name"}</b>
+        <b>
+          {eventInfo.event.title !== " " ? eventInfo.event.title : "No Name"}
+        </b>
       </>
-    )
+    );
   }
- 
 
   return (
     <div className="">
@@ -34,10 +38,10 @@ const CustomCalendar = observer(function CustomCalendar() {
         <FullCalendar
           height="auto"
           weekends={eventStore.weekendsVisible}
-            initialEvents={eventStore.events.slice()} // alternatively, use the `events` setting to fetch from a feed
-            select={handleDateSelect}
-            eventContent={renderEventContent} // custom render function
-            eventClick={handleDateSelect}
+          initialEvents={eventStore.events.slice()} // alternatively, use the `events` setting to fetch from a feed
+          select={handleDateSelect}
+          eventContent={renderEventContent} // custom render function
+          eventClick={handleDateSelect}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           headerToolbar={{
             left: "prev,next today",
@@ -50,14 +54,12 @@ const CustomCalendar = observer(function CustomCalendar() {
           nowIndicator="true"
           slotMinTime="09:00:00"
           slotMaxTime="23:00:00"
-          editable={true}
           selectable={true}
           selectMirror={true}
         />
-        <CustomModal/>
+        <CustomModal />
       </div>
     </div>
   );
-}
-)
+});
 export default CustomCalendar;

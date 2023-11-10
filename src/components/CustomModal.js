@@ -1,4 +1,4 @@
-import { Fragment, useContext, useRef, useState } from "react";
+import { Fragment, useContext, useEffect, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { eventStoreContext } from "./EventStore";
 import { observer } from "mobx-react-lite";
@@ -9,7 +9,11 @@ const CustomModal = observer(() => {
   const [lastName, setLastName] = useState("");
 
   const cancelButtonRef = useRef(null);
-
+  useEffect(() => {
+    setFirstName(eventStore.user.firstName);
+    setLastName(eventStore.user.lastName);
+  }, [eventStore.user.firstName, eventStore.user.lastName]);
+  
   const handleDataAdd = (e) => {
     e.preventDefault();
     let title = firstName + " " + lastName;
@@ -24,7 +28,9 @@ const CustomModal = observer(() => {
           as="div"
           className="relative z-10"
           initialFocus={cancelButtonRef}
-          onClose={() =>{eventStore.toggleModal()}}
+          onClose={() => {
+            eventStore.toggleModal();
+          }}
         >
           <Transition.Child
             as={Fragment}
@@ -64,25 +70,26 @@ const CustomModal = observer(() => {
                           </li>
                           <li className="">
                             <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                              Start: {
-                                 eventStore.currentEvent?.event ?
-                                  eventStore.currentEvent.event.startStr.replace('T', " ").replace("+", " GMT+")  :
-                                   eventStore.currentEvent?.start ?
-                                    eventStore.currentEvent.start.toString():
-                                     null
-                                  }
+                              Start:{" "}
+                              {eventStore.currentEvent?.event
+                                ? eventStore.currentEvent.event.startStr
+                                    .replace("T", " ")
+                                    .replace("+", " GMT+")
+                                : eventStore.currentEvent?.start
+                                ? eventStore.currentEvent.start.toString()
+                                : null}
                             </p>
                           </li>
                           <li className="">
                             <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                              End: {
-                                eventStore.currentEvent?.event ?
-                                eventStore.currentEvent.event.endStr.replace('T', " ").replace("+", " GMT+")  :
-                                 eventStore.currentEvent?.end ?
-                                  eventStore.currentEvent.end.toString():
-                                   null
-                               
-                              }
+                              End:{" "}
+                              {eventStore.currentEvent?.event
+                                ? eventStore.currentEvent.event.endStr
+                                    .replace("T", " ")
+                                    .replace("+", " GMT+")
+                                : eventStore.currentEvent?.end
+                                ? eventStore.currentEvent.end.toString()
+                                : null}
                             </p>
                           </li>
                         </ul>
@@ -133,14 +140,18 @@ const CustomModal = observer(() => {
                       <button
                         type="button"
                         className="text-sm font-semibold leading-6 text-red-900"
-                        onClick={() => {eventStore.deleteEvent()}}
+                        onClick={() => {
+                          eventStore.deleteEvent();
+                        }}
                       >
                         Delete
                       </button>
                       <button
                         type="button"
                         className="text-sm font-semibold leading-6 text-gray-900"
-                        onClick={()=>{eventStore.toggleModal()}}
+                        onClick={() => {
+                          eventStore.toggleModal();
+                        }}
                       >
                         Cancel
                       </button>
