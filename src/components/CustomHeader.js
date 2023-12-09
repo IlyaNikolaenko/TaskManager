@@ -17,7 +17,13 @@ const CustomHeader = observer(function () {
   const gsi = window.google.accounts.id;
 
   const navigation = [
-    { name: "Dashboard", href: "#", current: false, isLogged: !isLogged },
+    {
+      name: "Dashboard",
+      href: "#",
+      current: false,
+      isLogged: !isLogged,
+      onClick: page404,
+    },
     { name: "Calendar", href: "#", current: true },
   ];
   const userNavigation = [
@@ -34,23 +40,19 @@ const CustomHeader = observer(function () {
       type: "icon",
     });
   });
+  function page404() {
+    alert("This page under construction");
+  }
 
   const handleCredentialResponce = (resp) => {
     setIsLogged(true);
-    const profile = jwtDecode(resp.credential);
-    eventStore.user = {
-      name: profile.name,
-      email: profile.email,
-      id: profile.sub,
-      imageUrl: profile.picture,
-      firstName: profile.given_name,
-      lastName: profile.family_name,
-    };
+    eventStore.getUser(jwtDecode(resp.credential));
   };
 
   function handleSignOut() {
     setIsLogged(false);
     gsi.disableAutoSelect();
+    eventStore.getUser({})
   }
 
   return (
@@ -75,6 +77,7 @@ const CustomHeader = observer(function () {
                           <a
                             key={item.name}
                             href={item.href}
+                            onClick={item?.onClick}
                             hidden={item?.isLogged}
                             className={classNames(
                               item.current
@@ -91,9 +94,10 @@ const CustomHeader = observer(function () {
                     </div>
                   </div>
                   <div id="signIn" hidden={isLogged}></div>
-                  {isLogged ? (
+                  {isLogged && 
                     <div className="hidden md:block">
                       <div className="ml-4 flex items-center md:ml-6">
+                        
                         {/* Profile dropdown */}
                         <Menu as="div" className="relative ml-3">
                           <div>
@@ -138,8 +142,8 @@ const CustomHeader = observer(function () {
                         </Menu>
                       </div>
                     </div>
-                  ) : null}
-                  {isLogged ? (
+                  }
+                  {isLogged && 
                     <div className="-mr-2 flex md:hidden">
                       {/* Mobile menu button */}
                       <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
@@ -158,7 +162,7 @@ const CustomHeader = observer(function () {
                         )}
                       </Disclosure.Button>
                     </div>
-                  ) : null}
+                  }
                 </div>
               </div>
 
@@ -169,6 +173,7 @@ const CustomHeader = observer(function () {
                       key={item.name}
                       as="a"
                       href={item.href}
+                      onClick={item.onClick}
                       className={classNames(
                         item.current
                           ? "bg-gray-900 text-white"
@@ -181,7 +186,7 @@ const CustomHeader = observer(function () {
                     </Disclosure.Button>
                   ))}
                 </div>
-                {isLogged ? (
+                {isLogged &&
                   <div className="border-t border-gray-700 pb-3 pt-4">
                     <div className="flex items-center px-5">
                       <div className="flex-shrink-0">
@@ -222,7 +227,7 @@ const CustomHeader = observer(function () {
                       ))}
                     </div>
                   </div>
-                ) : null}
+                }
               </Disclosure.Panel>
             </>
           )}

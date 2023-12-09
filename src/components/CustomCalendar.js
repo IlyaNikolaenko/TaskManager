@@ -13,12 +13,14 @@ const CustomCalendar = observer(function CustomCalendar() {
   const handleDateSelect = (selectInfo) => {
     if (!selectInfo?.event) {
       eventStore.toggleModal();
-      eventStore.currentEvent = selectInfo;
+      eventStore.getCurrentEvent(selectInfo);
       selectInfo.view.calendar.unselect(); // clear date selection
     } else if (selectInfo?.event.id === eventStore.user.id) {
       eventStore.toggleModal();
-      eventStore.currentEvent = selectInfo;
+      eventStore.getCurrentEvent(selectInfo);
       selectInfo.view.calendar.unselect(); // clear date selection
+    } else{
+      alert('This slot is already reserved')
     }
   };
 

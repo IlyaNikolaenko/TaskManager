@@ -25,6 +25,16 @@ export class EventStore {
   constructor() {
     makeAutoObservable(this);
   }
+  getUser(profile){
+    this.user={
+      name: profile?.name,
+      email: profile?.email,
+      id: profile?.sub,
+      imageUrl: profile?.picture,
+      firstName: profile?.given_name,
+      lastName: profile?.family_name,
+    }
+  }
 
   getEvents() {
     return this.events;
@@ -33,7 +43,9 @@ export class EventStore {
   createEventId() {
     return String(this.eventGuid++);
   }
-
+  getCurrentEvent(selectInfo){
+    this.currentEvent = selectInfo
+  }
   addEvent(selectInfo, title) {
     this.events.push({
       id: this.user.id || this.createEventId,
