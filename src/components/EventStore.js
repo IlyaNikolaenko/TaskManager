@@ -25,15 +25,15 @@ export class EventStore {
   constructor() {
     makeAutoObservable(this);
   }
-  getUser(profile){
-    this.user={
+  getUser(profile) {
+    this.user = {
       name: profile?.name,
       email: profile?.email,
       id: profile?.sub,
       imageUrl: profile?.picture,
       firstName: profile?.given_name,
       lastName: profile?.family_name,
-    }
+    };
   }
 
   getEvents() {
@@ -43,8 +43,8 @@ export class EventStore {
   createEventId() {
     return String(this.eventGuid++);
   }
-  getCurrentEvent(selectInfo){
-    this.currentEvent = selectInfo
+  getCurrentEvent(selectInfo) {
+    this.currentEvent = selectInfo;
   }
   addEvent(selectInfo, title) {
     this.events.push({
@@ -80,7 +80,7 @@ export class EventStore {
   toggleModal() {
     this.open = !this.open;
   }
-  
+
   toggleWeekends() {
     this.weekendsVisible = !this.weekendsVisible;
   }

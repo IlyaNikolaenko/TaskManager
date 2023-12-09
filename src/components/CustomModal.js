@@ -11,9 +11,21 @@ const CustomModal = observer(() => {
 
   const cancelButtonRef = useRef(null);
   useEffect(() => {
-    setFirstName(eventStore.currentEvent?.event?.title.split(' ')[0] || eventStore.user.firstName || "anonymous");
-    setLastName(eventStore.currentEvent?.event?.title.split(' ')[1] || eventStore.user.lastName || "user");
-  }, [eventStore.currentEvent?.event?.title, eventStore.user.firstName, eventStore.user.lastName]);
+    setFirstName(
+      eventStore.currentEvent?.event?.title.split(" ")[0] ||
+        eventStore.user.firstName ||
+        "anonymous"
+    );
+    setLastName(
+      eventStore.currentEvent?.event?.title.split(" ")[1] ||
+        eventStore.user.lastName ||
+        "user"
+    );
+  }, [
+    eventStore.currentEvent?.event?.title,
+    eventStore.user.firstName,
+    eventStore.user.lastName,
+  ]);
 
   const handleDataAdd = (e) => {
     e.preventDefault();
@@ -27,7 +39,7 @@ const CustomModal = observer(() => {
   const handleRemoveEvent = () => {
     eventStore.deleteEvent();
   };
-  
+
   return (
     <Transition.Root show={eventStore.open} as={Fragment}>
       <Dialog

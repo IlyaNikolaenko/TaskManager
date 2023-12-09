@@ -52,7 +52,7 @@ const CustomHeader = observer(function () {
   function handleSignOut() {
     setIsLogged(false);
     gsi.disableAutoSelect();
-    eventStore.getUser({})
+    eventStore.getUser({});
   }
 
   return (
@@ -94,10 +94,9 @@ const CustomHeader = observer(function () {
                     </div>
                   </div>
                   <div id="signIn" hidden={isLogged}></div>
-                  {isLogged && 
+                  {isLogged && (
                     <div className="hidden md:block">
                       <div className="ml-4 flex items-center md:ml-6">
-                        
                         {/* Profile dropdown */}
                         <Menu as="div" className="relative ml-3">
                           <div>
@@ -142,8 +141,8 @@ const CustomHeader = observer(function () {
                         </Menu>
                       </div>
                     </div>
-                  }
-                  {isLogged && 
+                  )}
+                  {isLogged && (
                     <div className="-mr-2 flex md:hidden">
                       {/* Mobile menu button */}
                       <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
@@ -162,7 +161,7 @@ const CustomHeader = observer(function () {
                         )}
                       </Disclosure.Button>
                     </div>
-                  }
+                  )}
                 </div>
               </div>
 
@@ -186,7 +185,7 @@ const CustomHeader = observer(function () {
                     </Disclosure.Button>
                   ))}
                 </div>
-                {isLogged &&
+                {isLogged && (
                   <div className="border-t border-gray-700 pb-3 pt-4">
                     <div className="flex items-center px-5">
                       <div className="flex-shrink-0">
@@ -227,7 +226,7 @@ const CustomHeader = observer(function () {
                       ))}
                     </div>
                   </div>
-                }
+                )}
               </Disclosure.Panel>
             </>
           )}

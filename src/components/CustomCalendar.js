@@ -19,8 +19,8 @@ const CustomCalendar = observer(function CustomCalendar() {
       eventStore.toggleModal();
       eventStore.getCurrentEvent(selectInfo);
       selectInfo.view.calendar.unselect(); // clear date selection
-    } else{
-      alert('This slot is already reserved')
+    } else {
+      alert("This slot is already reserved");
     }
   };
 
